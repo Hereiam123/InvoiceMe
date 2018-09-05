@@ -1,0 +1,24 @@
+{
+  "name": "invoicing-app",
+  "version": "1.0.0",
+  "description": "An invoicing app to check and store invoices",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Invoicing"
+  ],
+  "author": "De Maio",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^3.0.0",
+    "bluebird": "^3.5.2",
+    "body-parser": "^1.18.3",
+    "connect-multiparty": "^2.1.1",
+    "express": "^4.16.3",
+    "path": "^0.12.7",
+    "sqlite3": "^4.0.2",
+    "umzug": "^2.1.0"
+  }
+}
