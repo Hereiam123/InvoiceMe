@@ -1,25 +1,9 @@
 // server.js
 const express = require('express');
-const validator = require('express-validator');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const sqlite3 = require('sqlite3').verbose();
-
-/*let db = new sqlite3.Database('./database/InvoicingApp.db', (err) => {
-  if (err) {
-    return console.error(err.message);
-  }
-  console.log('Connected to the in-memory SQlite database.');
-});
-
-db.close((err) => {
-  if (err) {
-    console.error(err.message);
-  }
-  console.log('Close the database connection.');
-});*/
-
 const PORT = process.env.PORT || 3128;
 
 const app = express();
@@ -85,6 +69,77 @@ app.post("/login", function(req, res) {
       message: "Wrong Password, please retry"
    });
  });
+});
+
+app.post("/invoice", function(req, res) {
+  // validate data
+  if (!req.body.name) {
+    return res.json({
+      status: false,
+      message: "Invoice needs a name"
+    });
+  }
+  // create invoice
+  let db = new sqlite3.Database("./database/InvoicingApp.db");
+  let sql = `INSERT INTO invoices(name,user_id,paid) VALUES(
+    '${req.body.name}',
+    '${req.body.user_id}',
+    0
+  )`;
+
+  db.serialize(function() {
+  db.run(sql, function(err) {
+      if (err) {
+        throw err;
+      }
+      let invoice_id = this.lastID;
+      for (let i = 0; i < req.body.txn_names.length; i++) {
+        let query = `INSERT INTO transactions(name,price,invoice_id) VALUES(
+            '${req.body.txn_names[i]}',
+            '${req.body.txn_prices[i]}',
+            '${invoice_id}'
+        )`;
+        db.run(query);
+      }
+      return res.json({
+        status: true,
+        message: "Invoice created"
+      });
+    });
+  });
+  db.close();
+});
+
+app.get("/invoice/user/:user_id", function(req, res) {
+ let db = new sqlite3.Database("./database/InvoicingApp.db");
+ let sql = `SELECT * FROM invoices LEFT JOIN transactions ON invoices.id=transactions.invoice_id WHERE user_id='${req.params.user_id}'`;
+ db.all(sql, [], (err, rows) => {
+   if (err) {
+     throw err;
+   }
+   return res.json({
+     status: true,
+     transactions: rows
+   });
+ });
+ db.close();
+});
+
+app.get("/invoice/user/:user_id/:invoice_id", multipartMiddleware, function(req, res) {
+  let db = new sqlite3.Database("./database/InvoicingApp.db");
+  let sql = `SELECT * FROM invoices LEFT JOIN transactions ON invoices.id=transactions.invoice_id WHERE user_id='${
+    req.params.user_id
+  }' AND invoice_id='${req.params.invoice_id}'`;
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      throw err;
+    }
+    return res.json({
+      status: true,
+      transactions: rows
+    });
+  });
+  db.close();
 });
 
 app.listen(PORT, function(){
