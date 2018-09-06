@@ -1,5 +1,4 @@
 // src/components/SideNav.vue
-
 <template>
   <div>
       <span style="font-size:30px;cursor:pointer" v-on:click="openNav">&#9776;</span>

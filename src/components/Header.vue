@@ -7,6 +7,7 @@
         <span class="navbar-brand mb-0 h1">{{title}}</span>
     </nav>
 </template>
+
 <script>
 import SideNav from './SideNav'
 export default {
