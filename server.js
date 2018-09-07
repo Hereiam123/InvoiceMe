@@ -1,20 +1,30 @@
 // server.js
 const express = require('express');
 const bodyParser = require('body-parser');
+const multer = require('multer');
+const upload = multer();
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const sqlite3 = require('sqlite3').verbose();
 const PORT = process.env.PORT || 3128;
 
 const app = express();
-app.use(bodyParser.urlencoded({extended: false}));
+
+
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 app.get('/', function(req,res){
     res.send("Welcome to Invoicing App");
 });
 
-app.post('/register', function(req, res){
+app.post('/register', upload.any(),function(req, res){
    // check to make sure none of the fields are empty
    if( !req.body.name  || !req.body.email || !req.body.company_name || !req.body.password){
        return res.json({
@@ -41,7 +51,7 @@ app.post('/register', function(req, res){
   });
 });
 
-app.post("/login", function(req, res) {
+app.post("/login", upload.any(), function(req, res) {
   let db = new sqlite3.Database("./database/InvoicingApp.db");
   let sql = `SELECT * from users where email='${req.body.email}'`;
   db.all(sql, [], (err, rows) => {
@@ -71,7 +81,7 @@ app.post("/login", function(req, res) {
  });
 });
 
-app.post("/invoice", function(req, res) {
+app.post("/invoice", Vupload.any(), function(req, res) {
   // validate data
   if (!req.body.name) {
     return res.json({
@@ -125,7 +135,7 @@ app.get("/invoice/user/:user_id", function(req, res) {
  db.close();
 });
 
-app.get("/invoice/user/:user_id/:invoice_id", multipartMiddleware, function(req, res) {
+app.get("/invoice/user/:user_id/:invoice_id", function(req, res) {
   let db = new sqlite3.Database("./database/InvoicingApp.db");
   let sql = `SELECT * FROM invoices LEFT JOIN transactions ON invoices.id=transactions.invoice_id WHERE user_id='${
     req.params.user_id

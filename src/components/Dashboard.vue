@@ -11,22 +11,22 @@
 </template>
 
 <script>
-  import Header from "./Header";
-  import CreateInvoice from "./CreateInvoice";
-  import ViewInvoices from "./ViewInvoices";
-  export default {
-    name: "Dashboard",
-    components: {
-      Header,
-      CreateInvoice,
-      ViewInvoices,
-    },
-    data() {
-      return {
-        isactive: 'create',
-        title: "Invoicing App",
-        user : (this.$route.params.user) ? this.$route.params.user : null
-      };
-    }
-  };
+import Header from "./Header";
+import CreateInvoice from "./CreateInvoice";
+import ViewInvoices from "./ViewInvoices";
+export default {
+  name: "Dashboard",
+  components: {
+    Header,
+    CreateInvoice,
+    ViewInvoices,
+  },
+  data() {
+    return {
+      isactive: 'create',
+      title: "Invoicing App",
+      user : (this.$route.params.user) ? this.$route.params.user : null
+    };
+  }
+};
 </script>

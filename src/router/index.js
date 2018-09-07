@@ -1,6 +1,7 @@
 // src/router/index.js
 import Vue from 'vue'
 import Router from 'vue-router'
+import SignIn from '@/components/SignIn'
 import SignUp from '@/components/SignUp'
 import Dashboard from '@/components/Dashboard'
 
@@ -15,9 +16,14 @@ export default new Router({
       component: SignUp
     },
     {
+      path: '/signin',
+      name: 'SignIn',
+      component: SignIn
+    },
+    {
       path: '/dashboard',
       name: 'Dashboard',
       component: Dashboard
-    },
+    }
   ]
 })

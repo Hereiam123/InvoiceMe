@@ -8,7 +8,7 @@
             <form @submit.prevent="onSubmit">
               <div class="form-group">
                 <label for="">Invoice Name:</label>
-                  <input type="text" required class="form-control" placeholder="eg Seller's Invoice" v-model="invoice.name">
+                <input type="text" required class="form-control" placeholder="eg Seller's Invoice" v-model="invoice.name">
               </div>
               <div class="form-group">
                 <label for="">Invoice Price:</label><span> $ {{ invoice.total_price }}</span>
@@ -84,14 +84,14 @@
 </template>
 
 <script>
-import axios from "axios";
+import axios from "axios"
 export default {
   name: "CreateInvoice",
   data() {
     return {
       invoice: {
-        name: "",
-        total_price: 0
+        name: '',
+        total_price: ''
       },
       transactions: [],
       nextTxnId: 1,
@@ -160,3 +160,4 @@ export default {
     }
   }
 };
+</script>
