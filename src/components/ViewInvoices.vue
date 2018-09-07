@@ -22,7 +22,7 @@
                     <td>{{ invoice.name }}</td>
                     <td v-if="invoice.paid == 0 "> Unpaid </td>
                     <td v-else> Paid </td>
-                    <td ><a href="#" class="btn btn-success">TO INVOICE</a></td>                         </tr>
+                    <td ><a href="#" class="btn btn-success">TO INVOICE</a></td></tr>
                 </template>
               </tbody>
             </table>
@@ -44,10 +44,12 @@ export default {
     };
   },
   mounted() {
+    this.user = JSON.parse(localStorage.getItem('user'));
     axios
       .get(`http://localhost:3128/invoice/user/${this.user.id}`)
       .then(res => {
         if (res.data.status == true) {
+          console.log(res.data.invoices);
           this.invoices = res.data.invoices;
         }
       });

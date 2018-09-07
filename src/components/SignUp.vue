@@ -73,11 +73,6 @@ export default {
       formData.append("email", this.model.email);
       formData.append("company_name", this.model.company_name);
       formData.append("password", this.model.password);
-
-          for (var key of formData.entries()) {
-        console.log(key[0] + ', ' + key[1])
-      }
-
       this.loading = "Registering you, please wait";
       // Post to server
       axios.post("http://localhost:3128/register", formData).then(res => {
@@ -85,11 +80,13 @@ export default {
           this.loading = "";
           if (res.data.status == true) {
             // now send the user to the next route
+            localStorage.setItem("token", res.data.token);
+            localStorage.setItem("user", JSON.stringify(res.data.user));
             this.$router.push({
               name: "Dashboard",
               params: { user: res.data.user }
-              });
-          }else {
+            });
+          } else {
             this.status = res.data.message;
           }
         });
@@ -97,26 +94,6 @@ export default {
       else{
         alert("Passwords do not match");
       }
-    },
-    login() {
-     const formData = new FormData();
-     formData.append("email", this.model.email);
-     formData.append("password", this.model.password);
-     this.loading = "Signing in";
-     // Post to server
-     axios.post("http://localhost:3128/login", formData).then(res => {
-       // Post a status message
-       this.loading = "";
-       if (res.data.status == true) {
-         // now send the user to the next route
-         this.$router.push({
-           name: "Dashboard",
-           params: { user: res.data.user }
-         });
-       } else {
-         this.status = res.data.message;
-       }
-     });
     }
   }
 };

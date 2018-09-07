@@ -14,12 +14,13 @@
 import Header from "./Header";
 import CreateInvoice from "./CreateInvoice";
 import ViewInvoices from "./ViewInvoices";
+import SideNav from "./SideNav";
 export default {
   name: "Dashboard",
   components: {
     Header,
     CreateInvoice,
-    ViewInvoices,
+    ViewInvoices
   },
   data() {
     return {
@@ -27,6 +28,9 @@ export default {
       title: "Invoicing App",
       user : (this.$route.params.user) ? this.$route.params.user : null
     };
+  },
+  mounted() {
+    this.user = JSON.parse(localStorage.getItem("user"));
   }
 };
 </script>
