@@ -34,6 +34,24 @@
             </div>
           </div>
         </div>
+        <div class="row">
+          <form @submit.prevent="send" class="col-md-12">
+            <h3>Enter Recipient's Name and Email to Send Invoice</h3>
+            <div class="form-group">
+              <label for="">Recipient Name</label>
+              <input type="text" required class="form-control" placeholder="eg Chris" v-model="recipient.name">
+            </div>
+            <div class="form-group">
+              <label for="">Recipient Email</label>
+              <input type="email" required placeholder="eg chris@invoiceapp.com" class="form-control" v-model="recipient.email">
+            </div>
+            <div class="form-group">
+                <button class="btn btn-primary" >Send Invoice</button>
+                {{ loading }}
+                {{ status }}
+            </div>
+          </form>
+        </div>
       </div>
   </div>
 </template>
@@ -50,28 +68,46 @@ export default {
     return {
       invoice: {},
       transactions: [],
-      user: "",
-      total_price: 0
+      user: '',
+      total_price: 0,
+      recipient : {
+        name: '',
+        email: ''
+      },
+      loading : '',
+      status: '',
     };
   },
   methods: {
-    send() {}
+    send() {
+      this.status = "";
+      this.loading = "Sending Invoice, please wait....";
+      const formData = new FormData();
+      formData.append("user", JSON.stringify(this.user));
+      formData.append("recipient", JSON.stringify(this.recipient));
+      axios.post("http://localhost:3128/sendmail", formData, {
+        headers: {"x-access-token": localStorage.getItem("token")}
+      }).then(res => {
+        this.loading = '';
+        this.status = res.data.message
+      }); 
+    }
   },
   mounted() {
     // make request to fetch invoice data
     this.user = JSON.parse(localStorage.getItem("user"));
-    let token = localStorage.getItem("token");
     let invoice_id = this.$route.params.invoice_id;
     axios
       .get(`http://localhost:3128/invoice/user/${this.user.id}/${invoice_id}`, {
         headers: {
-          "x-access-token": token
+          "Authorization": "bearer " + localStorage.getItem("token")
         }
       })
       .then(res => {
         if (res.data.status == true) {
           this.transactions = res.data.transactions;
-          this.invoice = res.data.invoice;
+          this.invoice.id = res.data.transactions[0].invoice_id;
+          console.log(this.invoice);
           let total = 0;
           this.transactions.forEach(element => {
             total += parseInt(element.price);

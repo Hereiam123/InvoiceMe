@@ -4,6 +4,7 @@ import Router from 'vue-router'
 import SignIn from '@/components/SignIn'
 import SignUp from '@/components/SignUp'
 import Dashboard from '@/components/Dashboard'
+import SingleInvoice from '@/components/SingleInvoice'
 
 Vue.use(Router)
 
@@ -24,6 +25,11 @@ export default new Router({
       path: '/dashboard',
       name: 'Dashboard',
       component: Dashboard
+    },
+    {
+      path: '/invoice/user/:user_id/:invoice_id',
+      name: 'SingleInvoice',
+      component: SingleInvoice
     }
   ]
 })

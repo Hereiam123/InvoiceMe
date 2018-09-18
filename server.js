@@ -7,9 +7,19 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const sqlite3 = require('sqlite3').verbose();
 const jwt = require("jsonwebtoken");
+let nodemailer = require('nodemailer');
 const PORT = process.env.PORT || 3128;
 
 const app = express();
+
+//create mail transporter
+let transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'bdemaio1@gmail.com',
+    pass: '@youRay561' 
+  }
+});
 
 
 app.use(function(req, res, next) {
@@ -165,6 +175,7 @@ app.post("/invoice", function(req, res) {
       message: "Invoice needs a name"
     });
   }
+
   // create invoice
   let db = new sqlite3.Database("./database/InvoicingApp.db");
   let sql = `INSERT INTO invoices(name,user_id,paid) VALUES(
@@ -229,4 +240,31 @@ app.get("/invoice/user/:user_id/:invoice_id", function(req, res) {
 
 app.listen(PORT, function(){
     console.log(`App running on localhost:${PORT}`);
+});
+
+app.post("/sendmail", function(req, res) {
+  // get name  and email of sender
+  let sender = JSON.parse(req.body.user);
+  let recipient = JSON.parse(req.body.recipient);
+  let mailOptions = {
+    from: "bdemaio1@gmail.com",
+    to: recipient.email,
+    subject: `Hi, ${recipient.name}. Here's an Invoice from ${
+      sender.company_name
+    }`,
+    text: `You owe ${sender.company_name}`
+  };
+  transporter.sendMail(mailOptions, function(error, info) {
+    if (error) {
+      return res.json({
+        status: 200,
+        message: `Error sending main to ${recipient.name}`
+      });
+    } else {
+      return res.json({
+        status: 200,
+        message: `Email sent to ${recipient.name}`
+      });
+    }
+  });
 });

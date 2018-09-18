@@ -22,7 +22,8 @@
                     <td>{{ invoice.name }}</td>
                     <td v-if="invoice.paid == 0 "> Unpaid </td>
                     <td v-else> Paid </td>
-                    <td ><a href="#" class="btn btn-success">TO INVOICE</a></td></tr>
+                    <td ><router-link :to='`/invoice/user/${user.id}/${invoice.id}/`' class="btn btn-success">TO INVOICE</router-link></td>
+                  </tr>
                 </template>
               </tbody>
             </table>
@@ -54,7 +55,6 @@ export default {
       )
       .then(res => {
         if (res.data.status == true) {
-          console.log(res.data.transactions);
           this.invoices = res.data.transactions;
         }
       });

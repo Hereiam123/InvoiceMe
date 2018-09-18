@@ -142,9 +142,11 @@ export default {
         txn_names.push(element.name);
         txn_prices.push(element.price);
       });
+      for (var i = 0; i < txn_names.length; i++) {
+          formData.append('txn_names[]', txn_names[i]);
+          formData.append('txn_prices[]', txn_prices[i]);
+      }
       formData.append("name", this.invoice.name);
-      formData.append("txn_names", txn_names);
-      formData.append("txn_prices", txn_prices);
       formData.append("user_id", JSON.parse(localStorage.getItem('user')).id);
       formData.append("token", localStorage.getItem('token'));
       this.loading = "Creating Invoice, please wait ...";
