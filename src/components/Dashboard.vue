@@ -1,6 +1,9 @@
 <template>
   <div class="container-fluid" style="padding: 0px;">
     <Header v-bind:user="user"/>
+    <template v-if="user != null">
+        <SideNav v-bind:name="user.name" v-bind:company="user.company_name"/>
+    </template>
     <template v-if="this.isactive == 'create'">
       <CreateInvoice />
     </template>
@@ -20,7 +23,8 @@ export default {
   components: {
     Header,
     CreateInvoice,
-    ViewInvoices
+    ViewInvoices,
+    SideNav
   },
   data() {
     return {

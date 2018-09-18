@@ -13,9 +13,19 @@ const app = express();
 
 
 app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+
+  //intercepts OPTIONS method
+  if ('OPTIONS' === req.method) {
+    //respond with 200
+    res.send(200);
+  }
+  else {
+  //move on
+    next();
+  }
 });
 
 app.use(bodyParser.urlencoded({extended: true}));
@@ -73,34 +83,6 @@ app.post('/register', upload.any(),function(req, res){
   });
 });
 
-app.use(function(req, res, next) {
-  // check header or url parameters or post parameters for token
-  let token =
-    req.body.token || req.query.token || req.headers["x-access-token"];
-  // decode token
-  if (token) {
-    // verifies secret and checks exp
-    jwt.verify(token, app.get("appSecret"), function(err, decoded) {
-      if (err) {
-        return res.json({
-          success: false,
-          message: "Failed to authenticate token."
-        });
-      } else {
-        // if everything is good, save to request for use in other routes
-        req.decoded = decoded;
-        next();
-      }
-    });
-  } else {
-    // if there is no token
-    // return an error
-    return res.status(403).send({
-      success: false,
-      message: "No token provided."
-    });
-  }
-});
 
 app.post("/login", upload.any(), function(req, res) {
   let db = new sqlite3.Database("./database/InvoicingApp.db");
@@ -128,7 +110,8 @@ app.post("/login", upload.any(), function(req, res) {
       });
       return res.json({
         status: true,
-        token: token
+        token: token,
+        user: user
       });
     }
 
@@ -139,7 +122,42 @@ app.post("/login", upload.any(), function(req, res) {
   });
 });
 
-app.post("/invoice", upload.any(), function(req, res) {
+app.use(upload.any(),function(req, res, next) {
+  // check header or url parameters or post parameters for token
+
+  let token =
+    req.body.token || req.query.token || req.headers["authorization"];
+
+  if(req.headers["authorization"]){
+    token = token.split('bearer ')[1];
+  }
+
+  // decode token
+  if (token) {
+    // verifies secret and checks exp
+    jwt.verify(token, app.get("appSecret"), function(err, decoded) {
+      if (err) {
+        return res.json({
+          success: false,
+          message: "Failed to authenticate token."
+        });
+      } else {
+        // if everything is good, save to request for use in other routes
+        req.decoded = decoded;
+        next();
+      }
+    });
+  } else {
+    // if there is no token
+    // return an error
+    return res.status(403).send({
+      success: false,
+      message: "No token provided."
+    });
+  }
+});
+
+app.post("/invoice", function(req, res) {
   // validate data
   if (!req.body.name) {
     return res.json({
@@ -175,10 +193,9 @@ app.post("/invoice", upload.any(), function(req, res) {
       });
     });
   });
-  db.close();
 });
 
-app.get("/invoice/user/:user_id",upload.any(), function(req, res) {
+app.get("/invoice/user/:user_id", function(req, res) {
  let db = new sqlite3.Database("./database/InvoicingApp.db");
  let sql = `SELECT * FROM invoices LEFT JOIN transactions ON invoices.id=transactions.invoice_id WHERE user_id='${req.params.user_id}'`;
  db.all(sql, [], (err, rows) => {
@@ -193,7 +210,7 @@ app.get("/invoice/user/:user_id",upload.any(), function(req, res) {
  db.close();
 });
 
-app.get("/invoice/user/:user_id/:invoice_id", upload.any(), function(req, res) {
+app.get("/invoice/user/:user_id/:invoice_id", function(req, res) {
   let db = new sqlite3.Database("./database/InvoicingApp.db");
   let sql = `SELECT * FROM invoices LEFT JOIN transactions ON invoices.id=transactions.invoice_id WHERE user_id='${
     req.params.user_id

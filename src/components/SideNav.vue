@@ -18,7 +18,7 @@ export default {
   props: ["name", "company"],
   methods: {
    setActive(option) {
-      this.$parent.$parent.isactive = option;
+      this.$parent.isactive = option;
     },
     openNav() {
       document.getElementById("leftsidenav").style.width = "20%";
@@ -29,3 +29,12 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+  #leftsidenav{
+    overflow:hidden;
+    position:fixed;
+    left:0;
+    height:100%;
+  }
+</style>

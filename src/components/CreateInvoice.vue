@@ -145,7 +145,8 @@ export default {
       formData.append("name", this.invoice.name);
       formData.append("txn_names", txn_names);
       formData.append("txn_prices", txn_prices);
-      formData.append("user_id", this.$route.params.user.id);
+      formData.append("user_id", JSON.parse(localStorage.getItem('user')).id);
+      formData.append("token", localStorage.getItem('token'));
       this.loading = "Creating Invoice, please wait ...";
       // Post to server
       axios.post("http://localhost:3128/invoice", formData).then(res => {
