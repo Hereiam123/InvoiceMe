@@ -1,9 +1,8 @@
 // src/components/SideNav.vue
 <template>
   <div>
-      <span style="font-size:30px;cursor:pointer" v-on:click="openNav">&#9776;</span>
+      <span style="font-size:30px;cursor:pointer" v-on:click="openCloseNav">&#9776;</span>
       <div id="leftsidenav" class="sidenav">
-          <p style="font-size:12px;cursor:pointer" v-on:click="closeNav"><em>Close Nav</em></p>
           <p><em>Company: {{ company }} </em></p>
           <h3>Welcome, {{ name }}</h3>
           <p class="clickable" v-on:click="setActive('create')">Create Invoice</p>
@@ -20,11 +19,19 @@ export default {
    setActive(option) {
       this.$parent.isactive = option;
     },
-    openNav() {
-      document.getElementById("leftsidenav").style.width = "20%";
-    },
-    closeNav() {
-      document.getElementById("leftsidenav").style.width = "0%";
+    openCloseNav() {
+       this.open = !this.open;
+       if(this.open){
+          document.getElementById("leftsidenav").style.width = "20%";
+       }
+       else{
+          document.getElementById("leftsidenav").style.width = "0%";  
+       }
+    }
+  },
+  data(){
+    return {
+      open: true
     }
   }
 };

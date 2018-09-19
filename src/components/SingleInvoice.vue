@@ -66,7 +66,9 @@ export default {
   },
   data() {
     return {
-      invoice: {},
+      invoice: {
+        id: ''
+      },
       transactions: [],
       user: '',
       total_price: 0,
@@ -83,11 +85,10 @@ export default {
       this.status = "";
       this.loading = "Sending Invoice, please wait....";
       const formData = new FormData();
-      formData.append("user", JSON.stringify(this.user));
-      formData.append("recipient", JSON.stringify(this.recipient));
-      axios.post("http://localhost:3128/sendmail", formData, {
-        headers: {"x-access-token": localStorage.getItem("token")}
-      }).then(res => {
+      formData.append('user', JSON.stringify(this.user));
+      formData.append('recipient', JSON.stringify(this.recipient));
+      formData.append("token", localStorage.getItem('token'));
+      axios.post("http://localhost:3128/sendmail", formData).then(res => {
         this.loading = '';
         this.status = res.data.message
       }); 
@@ -107,7 +108,6 @@ export default {
         if (res.data.status == true) {
           this.transactions = res.data.transactions;
           this.invoice.id = res.data.transactions[0].invoice_id;
-          console.log(this.invoice);
           let total = 0;
           this.transactions.forEach(element => {
             total += parseInt(element.price);

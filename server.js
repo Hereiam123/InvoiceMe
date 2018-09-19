@@ -145,7 +145,7 @@ app.use(upload.any(),function(req, res, next) {
   // decode token
   if (token) {
     // verifies secret and checks exp
-    jwt.verify(token, app.get("appSecret"), function(err, decoded) {
+    jwt.verify(token, app.get("appSecret"), function(err) {
       if (err) {
         return res.json({
           success: false,
@@ -153,7 +153,7 @@ app.use(upload.any(),function(req, res, next) {
         });
       } else {
         // if everything is good, save to request for use in other routes
-        req.decoded = decoded;
+        req.decoded = req.body;
         next();
       }
     });
@@ -165,6 +165,35 @@ app.use(upload.any(),function(req, res, next) {
       message: "No token provided."
     });
   }
+});
+
+
+app.post("/sendmail", upload.any(), function(req, res) {
+  // get name  and email of sender
+  let request=req.decoded;
+  let sender = JSON.parse(request.user);
+  let recipient = JSON.parse(request.recipient);
+  let mailOptions = {
+    from: "bdemaio1@gmail.com",
+    to: recipient.email,
+    subject: `Hi, ${recipient.name}. Here's an Invoice from ${
+      sender.company_name
+    }`,
+    text: `You owe ${sender.company_name}`
+  };
+  transporter.sendMail(mailOptions, function(error, info) {
+    if (error) {
+      return res.json({
+        status: 200,
+        message: `Error sending main to ${recipient.name}`
+      });
+    } else {
+      return res.json({
+        status: 200,
+        message: `Email sent to ${recipient.name}`
+      });
+    }
+  });
 });
 
 app.post("/invoice", function(req, res) {
@@ -238,33 +267,9 @@ app.get("/invoice/user/:user_id/:invoice_id", function(req, res) {
   db.close();
 });
 
+
 app.listen(PORT, function(){
     console.log(`App running on localhost:${PORT}`);
 });
 
-app.post("/sendmail", function(req, res) {
-  // get name  and email of sender
-  let sender = JSON.parse(req.body.user);
-  let recipient = JSON.parse(req.body.recipient);
-  let mailOptions = {
-    from: "bdemaio1@gmail.com",
-    to: recipient.email,
-    subject: `Hi, ${recipient.name}. Here's an Invoice from ${
-      sender.company_name
-    }`,
-    text: `You owe ${sender.company_name}`
-  };
-  transporter.sendMail(mailOptions, function(error, info) {
-    if (error) {
-      return res.json({
-        status: 200,
-        message: `Error sending main to ${recipient.name}`
-      });
-    } else {
-      return res.json({
-        status: 200,
-        message: `Email sent to ${recipient.name}`
-      });
-    }
-  });
-});
+
