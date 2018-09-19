@@ -14,11 +14,12 @@ const app = express();
 
 //create mail transporter
 let transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'bdemaio1@gmail.com',
-    pass: '@youRay561' 
-  }
+    host: 'smtp.ethereal.email',
+    port: 587,
+    auth: {
+        user: 'd4h4krosiazydzt5@ethereal.email',
+        pass: 'RdNHMzJbzG6hsXHFfy'
+    }
 });
 
 
@@ -174,7 +175,7 @@ app.post("/sendmail", upload.any(), function(req, res) {
   let sender = JSON.parse(request.user);
   let recipient = JSON.parse(request.recipient);
   let mailOptions = {
-    from: "bdemaio1@gmail.com",
+    from: "d4h4krosiazydzt5@ethereal.email",
     to: recipient.email,
     subject: `Hi, ${recipient.name}. Here's an Invoice from ${
       sender.company_name
